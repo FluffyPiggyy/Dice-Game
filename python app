@@ -1,0 +1,39 @@
+from flask import Flask, render_template, request
+import random
+from flask import url_for
+
+
+app = Flask(__name__)
+
+
+def roll_dice():
+    return random.randint(1, 6)
+
+
+def display_dice_image(number):
+    return url_for('static', filename=f'dice{number}.png')
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        # Handle form submission (roll the dice again)
+        first_dice = roll_dice()
+        second_dice = roll_dice()
+    else:
+        # Initial page load
+        first_dice = 0
+        second_dice = 0
+
+    dice1_img = display_dice_image(first_dice)
+    dice2_img = display_dice_image(second_dice)
+
+    odd = {1, 3, 5}
+    result = "You win!" if first_dice in odd and second_dice in odd else "You lose!"
+
+    return render_template('index.html', first_dice=first_dice, second_dice=second_dice, result=result, dice1_img=dice1_img, dice2_img=dice2_img)
+
+
+if __name__ == '__main__':
+
+    app.run(debug=True)
